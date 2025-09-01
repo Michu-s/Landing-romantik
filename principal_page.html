@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffe6ef" />
+  <title>ROMANTIK</title>
+  <!-- Fuentes (opcional). Si prefieres rendimiento, quita estas líneas y se usarán fuentes del sistema -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* Paleta suave y romántica */
+      --bg:#fff1f6;           /* fondo base */
+      --bg2:#ffe6ef;          /* fondo gradiente */
+      --text:#3a0f1e;         /* texto principal */
+      --muted:#7a3a50;        /* texto secundario */
+      --card:#ffffff;         /* tarjetas */
+      --border:#ffd4e1;       /* bordes */
+      --accent:#ff7aa2;       /* acento rosa */
+      --accent2:#ff9cba;      /* acento degradado */
+      --ring:rgba(255,122,162,.45); /* foco accesible */
+      --shadow: 0 10px 24px rgba(0,0,0,.08);
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{
+      margin:0; line-height:1.55; color:var(--text);
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+      background: radial-gradient(80% 80% at 50% 20%, var(--bg2) 0%, var(--bg) 60%);
+    }
+
+    .container{ width:100%; max-width:980px; margin:0 auto; padding: clamp(16px, 5vw, 28px); }
+    h1,h2{ font-family:'Playfair Display', ui-serif, Georgia, 'Times New Roman', serif; letter-spacing:.2px; }
+    h1{ font-size: clamp(28px, 7vw, 44px); margin:0 0 8px; }
+    h2{ font-size: clamp(22px, 5.4vw, 32px); margin:0 0 10px; }
+    p{ margin:0 0 10px; color:var(--muted); font-size: clamp(14px, 3.8vw, 16px); }
+
+    .btn{ appearance:none; -webkit-appearance:none; display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+      min-height:48px; padding:12px 18px; border-radius:999px; font-weight:700; text-decoration:none; font-size:1rem;
+      border:1px solid transparent; color:#2a0b14; background-image:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 6px 18px rgba(255,122,162,.25);
+      transition:transform .08s ease, filter .2s ease, box-shadow .2s ease; }
+    .btn:hover{ filter:brightness(1.04); }
+    .btn:active{ transform:translateY(1px) scale(.99); }
+    .btn:focus{ outline:none; box-shadow:0 0 0 3px var(--ring); }
+
+    /* HERO de presentación */
+    .hero{ display:grid; gap:16px; align-items:center; }
+    .hero-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.95)), var(--card);
+      border:1px solid var(--border); border-radius:20px; padding:20px; box-shadow:var(--shadow);
+      position: relative; overflow: hidden;
+    }
+    .hero-card:after{ /* corazoncitos sutiles */
+      content:""; position:absolute; inset:-20%; pointer-events:none; opacity:.06;
+      background:
+        radial-gradient(circle at 20% 30%, #ff7aa2 6px, transparent 7px),
+        radial-gradient(circle at 60% 70%, #ff9cba 8px, transparent 9px),
+        radial-gradient(circle at 85% 25%, #ff7aa2 5px, transparent 6px);
+      transform: rotate(-8deg);
+    }
+    .hero-img{ width:100%; border-radius:16px; object-fit:cover; max-height: 42vh; }
+    .hero-small{ color:var(--muted); font-size: .95rem; margin-top: 6px; }
+
+    /* Cajitas musicales */
+    .music{ margin-top: 18px; }
+    .music-grid{ display:grid; grid-template-columns: 1fr; gap:12px; }
+    @media(min-width:560px){ .music-grid{ grid-template-columns: repeat(2,1fr); } }
+    .music-card{
+      position:relative; background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow);
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px; padding:12px;
+    }
+    .music-thumb{ width:64px; height:64px; border-radius:12px; object-fit:cover; background:#f7e9ee; }
+    .music-meta{ min-width:0; }
+    .music-title{ font-weight:700; font-size:15px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .music-sub{ font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pill{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:#fff; color:var(--muted); }
+    .music-ctrl{ display:flex; align-items:center; gap:8px; }
+    .play, .info{ appearance:none; -webkit-appearance:none; border:none; display:grid; place-items:center; width:44px; height:44px; border-radius:999px; cursor:pointer; }
+    .play{ background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#2a0b14; box-shadow:0 6px 14px rgba(255,122,162,.25); }
+    .info{ background:#fff; border:1px solid var(--border); color:var(--muted); }
+
+    .play.playing{ box-shadow: 0 0 0 3px var(--ring), 0 6px 14px rgba(255,122,162,.35); }
+    .music-card.playing{ border-color: var(--accent2); }
+
+    /* El iframe se inyecta tras tocar play */
+    .yt-frame{ display:none; grid-column: 1 / -1; aspect-ratio: 16 / 9; width:100%; border:0; border-radius:12px; overflow:hidden; }
+    .yt-frame.active{ display:block; }
+
+    /* Sección Recuerdos */
+    .section{ margin-top: 28px; }
+    .memories-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    @media(min-width:720px){ .memories-grid{ grid-template-columns: repeat(3,1fr); } }
+    .memory-card{ position:relative; background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); cursor:pointer; }
+    .memory-img{ width:100%; height:150px; object-fit:cover; display:block; }
+    .memory-caption{ padding:10px 12px; font-weight:600; font-size:14px; color:var(--text); }
+
+    /* Modal para texto largo */
+    .overlay{ position:fixed; inset:0; background:rgba(255,230,239,.6); backdrop-filter: blur(6px); display:none; place-items:center; z-index:80; padding:16px; }
+    .overlay.show{ display:grid; }
+    .modal{ width:min(92vw, 560px); max-height:80vh; background:var(--card); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); display:grid; grid-template-rows:auto 1fr; overflow:hidden; }
+    .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border); }
+    .modal-title{ font-weight:700; }
+    .modal-close{ appearance:none; -webkit-appearance:none; background:transparent; border:1px solid var(--border); border-radius:999px; width:36px; height:36px; display:grid; place-items:center; cursor:pointer; }
+    .modal-body{ padding:14px; overflow:auto; color:var(--muted); line-height:1.6; }
+
+    /* Footer */
+    .site-footer{ margin-top:32px; padding:24px clamp(16px, 5vw, 28px); background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,241,246,1)); border-top:1px solid var(--border); }
+    .footer-msg{ text-align:center; color:var(--muted); margin-bottom:14px; font-size:.95rem; }
+    .devs{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+    .dev-card{ display:flex; align-items:center; gap:10px; padding:8px 12px; background:#fff; border:1px solid var(--border); border-radius:16px; box-shadow: var(--shadow); }
+    .dev-avatar{ width:48px; height:48px; border-radius:999px; object-fit:cover; border:1px solid var(--border); }
+    .dev-name{ font-weight:700; color:var(--text); font-size:14px; }
+    .dev-role{ font-size:12px; color:var(--muted); }
+
+    /* Utilidades */
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; white-space:nowrap; }
+    @media(prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important;} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HERO: Presentación + imagen grande -->
+    <section class="hero" id="inicio" aria-label="Presentación">
+      <div class="hero-card">
+        <h1>Para <span id="nombre">mi bolita de arroz</span> 💗</h1>
+        <p>
+          Esta es una pequeña cajita de nuestros recuerdos. La hice con mucho entusiasmo y ganas por darte un detalle <em>especial</em>.
+        </p>
+        <p>
+          Si alguna vez dudas de lo mucho que te quiero, vuelve aquí. Te prometo que en estas páginas siempre cabrá una apachurrada más.
+        </p>
+        <p class="hero-small">Con todo mi amor,<br><strong>Brandon</strong></p>
+      </div>
+      <img class="hero-img" src="images/presentacion.jpg" alt="Foto adorable de nosotros" />
+      <div class="music">
+        <h2>Play‑list seleccionado…</h2>
+        <p>
+          Con estas canciones te digo lo de siempre: <strong>te quiero y te amo</strong>. Algunas letras nos quedan perfectas,
+          y algunas solo serán un aporte que te dedico con todo mi cariño.
+        </p>
+        <div class="music-grid" id="musicGrid">
+          <!-- Music Card 1 -->
+          <article class="music-card" data-video="sodp4caaGC0" data-start="14" data-end="85" data-title="Para cada te extraño" data-sub="Los Panchos" data-thumb="https://img.youtube.com/vi/sodp4caaGC0/hqdefault.jpg" data-text="
+          La letra representa una letra que me vino a la mente cuando realmente te extrañaba (siempre).
+          Los Panchos - Sin ti (0:14-1:25)">
+            <img class="music-thumb" alt="Portada" loading="lazy" />
+            <div class="music-meta">
+              <div class="music-title"></div>
+              <div class="music-sub"></div>
+            </div>
+            <div class="music-ctrl">
+              <button class="play" aria-label="Reproducir">▶</button>
+              <button class="info" aria-label="Ver texto">💬</button>
+            </div>
+            <iframe class="yt-frame" allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope" allowfullscreen></iframe>
+          </article>
+          <!-- Music Card 2 -->
+          <article class="music-card" data-video="ZmjCgMSxwjU" data-start="26" data-end="52" data-title="Tu sabes..." data-sub="Rels B" data-thumb="https://img.youtube.com/vi/ZmjCgMSxwjU/hqdefault.jpg" data-text="La canción lo dice por mi, así que solo escúchalo, sé que lo disfrutarás.
+           Rels B - Tienes El Don(0:26-0:52)">
+            <img class="music-thumb" alt="Portada" loading="lazy" />
+            <div class="music-meta">
+              <div class="music-title"></div>
+              <div class="music-sub"></div>
+            </div>
+            <div class="music-ctrl">
+              <button class="play" aria-label="Reproducir">▶</button>
+              <button class="info" aria-label="Ver texto">💬</button>
+            </div>
+            <iframe class="yt-frame" allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope" allowfullscreen></iframe>
+          </article>
+          <!-- Music Card 3 -->
+          <article class="music-card" data-video="X7aF3nZOS98" data-start="0" data-end="48" data-title="I know?" data-sub="Travis Scott" data-thumb="https://img.youtube.com/vi/X7aF3nZOS98/hqdefault.jpg" data-text="Parecía que fue lo que escuche las veces que amanecí a tu lado. Extraño esas noches
+          . La letra es algo vulgar por lo que solo expreso el fragmento: Travis Scott - I Know ? (0:00-0:48)">
+            <img class="music-thumb" alt="Portada" loading="lazy" />
+            <div class="music-meta">
+              <div class="music-title"></div>
+              <div class="music-sub"></div>
+            </div>
+            <div class="music-ctrl">
+              <button class="play" aria-label="Reproducir">▶</button>
+              <button class="info" aria-label="Ver texto">💬</button>
+            </div>
+            <iframe class="yt-frame" allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope" allowfullscreen></iframe>
+          </article>
+          <!-- Music Card 4 -->
+          <article class="music-card" data-video="0VGjV8Suyvg" data-start="5" data-end="24" data-title="Escucha esto" data-sub="2Pac" data-thumb="https://img.youtube.com/vi/0VGjV8Suyvg/hqdefault.jpg" data-text="Esta canción es una parte de mi expresión hacia cada cosa que me gusta hacer,
+           sé de ante mano que está en inglés, pero quiero ahora que entiendas lo que es cada pensamiento de querer estar contigo. i do for love.">
+            <img class="music-thumb" alt="Portada" loading="lazy" />
+            <div class="music-meta">
+              <div class="music-title"></div>
+              <div class="music-sub"></div>
+            </div>
+            <div class="music-ctrl">
+              <button class="play" aria-label="Reproducir">▶</button>
+              <button class="info" aria-label="Ver texto">💬</button>
+            </div>
+            <iframe class="yt-frame" allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope" allowfullscreen></iframe>
+          </article>
+          <!-- Music Card 5 -->
+          <article class="music-card" data-video="aBSkvI0CkgU" data-start="3" data-end="50" data-title="Quiero que escuches..." data-sub="Milo J" data-thumb="https://img.youtube.com/vi/aBSkvI0CkgU/hqdefault.jpg" data-text="Los primeros 50 segundos emanaron de mí cuando intentamos lo que ahora vamos somos.
+          Puedo decir que lo escucho con ganas de besarte y abrazarte. Milo J - RARA VEZ (0:03-0:53)">
+            <img class="music-thumb" alt="Portada" loading="lazy" />
+            <div class="music-meta">
+              <div class="music-title"></div>
+              <div class="music-sub"></div>
+            </div>
+            <div class="music-ctrl">
+              <button class="play" aria-label="Reproducir">▶</button>
+              <button class="info" aria-label="Ver texto">💬</button>
+            </div>
+            <iframe class="yt-frame" allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope" allowfullscreen></iframe>
+          </article>
+          <!-- Music Card 6 -->
+          <article class="music-card" data-video="J_8xCOSekog" data-start="80" data-end="190" data-title="Yo también..." data-sub="Mac Miller" data-thumb="https://img.youtube.com/vi/J_8xCOSekog/hqdefault.jpg" data-text="En efecto, soy tu Mac Miller miamor🥰 (la letra es una carta para ti)">
+            <img class="music-thumb" alt="Portada" loading="lazy" />
+            <div class="music-meta">
+              <div class="music-title"></div>
+              <div class="music-sub"></div>
+            </div>
+            <div class="music-ctrl">
+              <button class="play" aria-label="Reproducir">▶</button>
+              <button class="info" aria-label="Ver texto">💬</button>
+            </div>
+            <iframe class="yt-frame" allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope" allowfullscreen></iframe>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECUERDOS: tarjetas con foto + modal de texto largo -->
+    <section class="section" id="recuerdos" aria-label="Recuerdos">
+      <h2>En mi memoria</h2>
+      <p>Pequeños fragmentos y una vista atrás de los momentos estando contigo. Más que nada, es una visita a mi baúl de mis recuerdos.</p>
+      <div class="memories-grid">
+        <article class="memory-card" data-title="Nuestra visita a Animaya" data-text="En un día, si no mal recuerdo, en propedeúticos luego de una sorprendente noticia de entrar a la escuela,
+         una oportunidad para conocerte y con la bonita visita a ver tus animalitos en el Animaya (no había pisado Animaya en un ratote, asi que, primera vez como universitario xd)💗" data-img="images/animaya.jpg">
+          <img class="memory-img" src="images/animaya.jpg" alt="Foto de la salida" loading="lazy" />
+          <div class="memory-caption">De las primeras citas</div>
+        </article>
+        <article class="memory-card" data-title="Una nochesita" data-text="Una de las tantas noches que la pasamos juntos y quedó de recuerdo cuando te peinaban de palmerita. Por consecuencia aquí de palmeritos jaja😝." data-img="images/unanoche.jpg">
+          <img class="memory-img" src="images/unanoche.jpg" alt="Una noche" loading="lazy" />
+          <div class="memory-caption">Una nochesita</div>
+        </article>
+        <article class="memory-card" data-title="Domingo de novios" data-text="Una misa de novios y lo unico que recuerdo, lo linda que te veían con ese vestidito. Te mereces unos besotes sabor a hostia😇. Me encanta esta foto porque tienen tus ojitos lindos y pispiretos(junto con las crias🥰)" data-img="images/pispireco.jpg">
+          <img class="memory-img" src="images/pispireco.jpg" alt="Foto de la sorpresa" loading="lazy" />
+          <div class="memory-caption">Domingo pro</div>
+        </article>
+        <!-- +8 recuerdos -->
+        <article class="memory-card" data-title="Una salidita🥰" data-text="Una salidita tuya con el vesidito que me encanta también como la que lo trae puesto🥰. Que bella con la coronita de lucesitas tambien🥰" data-img="images/salidita.jpg">
+          <img class="memory-img" src="images/salidita.jpg" alt="Caminata bajo la lluvia" loading="lazy" />
+          <div class="memory-caption"> Que linda mi novia</div>
+        </article>
+        <article class="memory-card" data-title="Combi-nados" data-text="Como los dias de universitarios, uno normalon en la combi pero que bellos🥰" data-img="images/encombi.jpg">
+          <img class="memory-img" src="images/encombi.jpg" alt="Noche de peli" loading="lazy" />
+          <div class="memory-caption">universitarios</div>
+        </article>
+        <article class="memory-card" data-title="Mi naranja dulce (china pa los compas)🥰" data-text="Mira que linda riendose tanto que ni ve, para el quinceaños de la chavita esa renesnosequecosa.
+         Pero que divertido la pasamos juntos, mira nomás😁." data-img="images/china.jpg">
+          <img class="memory-img" src="images/china.jpg" alt="Risa en la plaza" loading="lazy" />
+          <div class="memory-caption">risitas xd</div>
+        </article>
+        <article class="memory-card" data-title="alucina" data-text="No sé, solo quiero mucho a esa alucina🥰." data-img="images/alucina.jpg">
+          <img class="memory-img" src="images/alucina.jpg" alt="Atardecer rosado" loading="lazy" />
+          <div class="memory-caption">q pro</div>
+        </article>
+        <article class="memory-card" data-title="Quiero apachurrarte todos los días de mi vida" data-text="Que puedo decir?, la parte favorita de estar contigo siempre es apachurrarte toda y darte besitos porque te quiero mucho🥰." data-img="images/favpart.jpg">
+          <img class="memory-img" src="images/favpart.jpg" alt="Foto borrosa" loading="lazy" />
+          <div class="memory-caption">acurrucaditos</div>
+        </article>
+        <article class="memory-card" data-title="Llegó navida (casi)" data-text="En el palco de tu tio que me quiere balear🥰. Como buena bolita de arroz con las patucas (se nota la diferencia de estilos uno dura y la otra dura también pero con botas🤠)." data-img="images/fiestaa.jpg">
+          <img class="memory-img" src="images/fiestaa.jpg" alt="Desayuno" loading="lazy" />
+          <div class="memory-caption">Casi navidad</div>
+        </article>
+        <article class="memory-card" data-title="Un recuerdito que tenemos" data-text="Las mejores noches que pasamos juntos, no me arrepiento de nada, soy preso de tus besos🥰." data-img="images/besitos.jpg">
+          <img class="memory-img" src="images/besitos.jpg" alt="Cartita" loading="lazy" />
+          <div class="memory-caption">Pijamada pro</div>
+        </article>
+        <article class="memory-card" data-title="Una visita con las primitas" data-text="Donde convivimos juntos con la primita que me la aplicó (no me acuerdo su nombre), y estabamos allí mero. Que linda con ese vestidito azul, es una belleza tus cachetes🥰" data-img="images/bolitasdearro.jpg">
+          <img class="memory-img" src="images/bolitasdearro.jpg" alt="Lugar secreto" loading="lazy" />
+          <div class="memory-caption">una visita</div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer de estado + agradecimientos -->
+  <footer class="site-footer" role="contentinfo" aria-labelledby="footer-title">
+    <p class="footer-msg"><strong>Esta página se encuentra en fase de desarrollo</strong> — Próximamente con futuras actualizaciones...</p>
+    <div class="devs" aria-label="Agradecimientos">
+      <div class="dev-card">
+        <img class="dev-avatar" src="images/fotona.jpg" alt="Foto del desarrollador/a 1" loading="lazy" />
+        <div>
+          <div class="dev-name">Brandon Tun</div>
+          <div class="dev-role">Diseño & Operabilidad</div>
+        </div>
+      </div>
+      <div class="dev-card">
+        <img class="dev-avatar" src="images/chatpro.jpg" alt="Foto del desarrollador/a 2" loading="lazy" />
+        <div>
+          <div class="dev-name">Chat GPT</div>
+          <div class="dev-role">Apoyo/Soporte</div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL reutilizable para textos largos -->
+  <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal" role="document">
+      <div class="modal-header">
+        <div id="modalTitle" class="modal-title">Título</div>
+        <button id="closeModal" class="modal-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- YouTube Iframe API (pre-carga para no perder el gesto del usuario) -->
+  <script>
+    // ====== Utilidades ======
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    // ====== Modal (compartido para recuerdos y canciones) ======
+    const overlay = $('#overlay');
+    const modalBody = $('#modalBody');
+    const modalTitle = $('#modalTitle');
+    const closeBtn = $('#closeModal');
+
+    function openModal({title, text}){
+      modalTitle.textContent = title || '';
+      modalBody.textContent = text || '';
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(){ overlay.classList.remove('show'); document.body.style.overflow = ''; }
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && overlay.classList.contains('show')) closeModal(); });
+
+    // ====== Música (YouTube fragmentos) ======
+    let YT_API_READY = false; // bandera
+    const players = new Map();  // card -> YT.Player
+
+    function loadYouTubeAPI() {
+      return new Promise((resolve) => {
+        if (YT_API_READY) return resolve();
+        const s = document.createElement('script');
+        s.src = 'https://www.youtube.com/iframe_api';
+        document.body.appendChild(s);
+        window.onYouTubeIframeAPIReady = () => { YT_API_READY = true; resolve(); };
+      });
+    }
+
+    function buildEmbedSrc(id, start, end){
+      const base = `https://www.youtube.com/embed/${id}?enablejsapi=1&playsinline=1&rel=0&controls=0&modestbranding=1`;
+      const qs = [`start=${start||0}`, end?`end=${end}`:null, 'autoplay=1', 'mute=1'];
+      const origin = (location.protocol === 'http:' || location.protocol === 'https:') ? `origin=${encodeURIComponent(location.origin)}` : null;
+      return `${base}&${qs.filter(Boolean).join('&')}${origin?`&${origin}`:''}`;
+    }
+
+    function setupMusicCards(){
+      const setUI = (card, playing) => {
+        const btn = $('.play', card);
+        if (!btn) return;
+        btn.textContent = playing ? '❚❚' : '▶';
+        btn.setAttribute('aria-label', playing ? 'Pausar' : 'Reproducir');
+        card.classList.toggle('playing', !!playing);
+        btn.classList.toggle('playing', !!playing);
+      };
+      const pauseOthers = (exceptCard) => {
+        players.forEach((pl, otherCard) => {
+          if (otherCard !== exceptCard) {
+            try { pl.pauseVideo(); } catch(_){/* noop */}
+            setUI(otherCard, false);
+          }
+        });
+      };
+      const ytLink = (id, start) => `https://www.youtube.com/watch?v=${id}&t=${Math.max(0, start|0)}s`;
+      const fallbackToExternal = (card, videoId, start) => {
+        // Limpia cualquier rastro del player y marca el card como "externo"
+        try { const p = players.get(card); p?.destroy?.(); } catch(_){}
+        players.delete(card);
+        const iframe = $('.yt-frame', card);
+        if (iframe){ try{ iframe.src = ''; }catch(_){} iframe.classList.remove('active'); }
+        card.dataset.external = '1';
+        setUI(card, false);
+        // Navega en la MISMA pestaña para que al volver con "Atrás" la página se refresque sola
+        location.href = ytLink(videoId, start);
+      };
+
+      $$('.music-card').forEach((card) => {
+        // Pinta datos
+        const title = $('.music-title', card);
+        const sub   = $('.music-sub', card);
+        const thumb = $('.music-thumb', card);
+        title.textContent = card.dataset.title || 'Canción';
+        sub.textContent   = card.dataset.sub   || '';
+        const t = card.dataset.thumb; if (t) thumb.src = t; else thumb.style.background = '#f3d6df';
+
+        // Play/Pause handler
+        const playBtn = $('.play', card);
+        playBtn.addEventListener('click', async (ev) => {
+          ev.stopPropagation();
+
+          const videoId = card.dataset.video;
+          const start = parseInt(card.dataset.start||'0',10);
+          const end   = parseInt(card.dataset.end||'0',10);
+
+          // Si el card ya fue marcado como externo, abre YouTube directamente
+          if (card.dataset.external === '1') {
+            location.href = ytLink(videoId, start);
+            return;
+          }
+
+          // Carga API con antelación para minimizar latencia
+          if (!YT_API_READY) { await loadYouTubeAPI(); }
+
+          let player = players.get(card);
+          const iframe = $('.yt-frame', card);
+
+          if (!player) {
+            // Semilla de iframe con autoplay silenciado (permitido) dentro del mismo gesto
+            iframe.src = buildEmbedSrc(videoId, start, end);
+            iframe.classList.add('active');
+
+            player = new YT.Player(iframe, {
+              host: 'https://www.youtube.com',
+              videoId: videoId,
+              playerVars: { playsinline: 1, rel: 0, controls: 0, modestbranding: 1, start: start||0, ...(end?{end}:{}), mute: 1 },
+              events: {
+                onReady: (e) => {
+                  try {
+                    // Desmuteamos inmediatamente tras arrancar
+                    e.target.playVideo();
+                    e.target.unMute?.();
+                    e.target.setVolume?.(100);
+                  } catch(_){/* noop */}
+                  setUI(card, true);
+                },
+                onStateChange: (e) => {
+                  if (e.data === YT.PlayerState.PLAYING) {
+                    pauseOthers(card);
+                    setUI(card, true);
+                  } else if (e.data === YT.PlayerState.PAUSED) {
+                    setUI(card, false);
+                  } else if (e.data === YT.PlayerState.ENDED) {
+                    setUI(card, false);
+                    try { e.target.stopVideo(); } catch(_){/* noop */}
+                  }
+                },
+                onError: (evt) => {
+                  // 2,5,100,101,150 -> error / restricciones de inserción
+                  fallbackToExternal(card, videoId, start);
+                }
+              }
+            });
+            players.set(card, player);
+
+            // Reintento breve por si la política de audio exige un segundo intento
+            setTimeout(() => { try {
+              const st = player.getPlayerState?.();
+              if (st !== YT.PlayerState.PLAYING) { player.playVideo(); player.unMute?.(); player.setVolume?.(100); }
+            } catch(_){/* noop */} }, 400);
+          } else {
+            try {
+              const s = player.getPlayerState();
+              if (s === YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+                setUI(card, false);
+              } else {
+                pauseOthers(card);
+                player.playVideo();
+                player.unMute?.();
+                player.setVolume?.(100);
+                setUI(card, true);
+              }
+            } catch(_){/* noop */}
+          }
+        });
+
+        // Info handler (abre modal con texto)
+        const infoBtn = $('.info', card);
+        infoBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          openModal({ title: card.dataset.title || 'Canción', text: card.dataset.text || '' });
+        });
+      });
+
+      // Pausar todo si se oculta la pestaña (ahorra batería y evita audio de fondo)
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          players.forEach((pl, c) => { try { pl.pauseVideo(); } catch(_){/* noop */} setUI(c, false); });
+        }
+      });
+
+      // Si vuelves desde YouTube con el botón "Atrás" y la página queda en bfcache, re-sincroniza UI
+      window.addEventListener('pageshow', () => {
+        players.forEach((pl, c) => { try { pl.pauseVideo(); } catch(_){/* noop */} setUI(c, false); });
+      });
+    }
+
+    // ====== Modal Recuerdos ======
+    function setupMemoriesModal(){
+      $$('.memory-card').forEach(card => {
+        card.addEventListener('click', () => {
+          openModal({ title: card.dataset.title, text: card.dataset.text });
+        });
+      });
+    }
+
+    // ====== Init ======
+    document.addEventListener('DOMContentLoaded', () => {
+      // Precarga la API para mayor fiabilidad
+      loadYouTubeAPI();
+      setupMusicCards();
+      setupMemoriesModal();
+    });
+  </script>
+</body>
+</html>

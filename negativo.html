@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffe6ef" />
+  <title>¿No quieres continuar?</title>
+  <style>
+    /* Tema adorable y suave — mobile‑first */
+    :root{
+      --bg1:#fff1f6;      /* rosa pálido */
+      --bg2:#ffe6ef;      /* pastel suave */
+      --card:#ffffff;     /* tarjeta clara */
+      --border:#ffd4e1;   /* borde rosado claro */
+      --text:#3a0f1e;     /* texto principal */
+      --muted:#7a3a50;    /* texto secundario */
+      --accent:#ff7aa2;   /* botón "Sí" */
+      --accent-2:#ff9cba; /* degradado */
+      --neutral:#f8f0f3;  /* botón "No" */
+      --ring:rgba(255,122,162,.45);
+    }
+
+    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(80% 80% at 50% 20%, var(--bg2) 0%, var(--bg1) 60%);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height:1.5;
+    }
+
+    .wrap{
+      min-height:100vh; /* fallback */
+      min-height:100dvh; /* altura real en Chrome móvil */
+      display:grid; place-items:center;
+      padding: max(16px, env(safe-area-inset-top))
+               max(16px, env(safe-area-inset-right))
+               max(16px, env(safe-area-inset-bottom))
+               max(16px, env(safe-area-inset-left));
+    }
+
+    .card{
+      width:100%; max-width:480px;
+      background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.95)), var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:20px; text-align:center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    h1{
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-size: clamp(20px, 6vw, 26px);
+      margin:0 0 8px;
+      letter-spacing:.2px;
+    }
+    p.desc{margin:0 0 16px; color:var(--muted); font-size:clamp(14px, 3.8vw, 16px)}
+
+    .hero{
+      display:block; width:100%;
+      max-height:48vh; object-fit:cover; object-position:center;
+      border-radius:16px; margin:10px 0 16px;
+      background: var(--neutral);
+    }
+
+    .actions{display:flex; flex-direction:column; gap:12px; align-items:stretch;}
+
+    .btn{
+      appearance:none; -webkit-appearance:none;
+      display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+      width:100%; min-height:48px; padding:12px 16px;
+      border-radius:999px; font-weight:700; text-decoration:none; font-size:1rem;
+      border:1px solid transparent; user-select:none; touch-action:manipulation;
+      transition: transform .08s ease, filter .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      color:var(--text);
+    }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+
+    .btn-primary{
+      background-image: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color:#ffc0d2; color:#2a0b14;
+      box-shadow:0 6px 18px rgba(255,122,162,.25);
+    }
+    .btn-primary:hover{ filter:brightness(1.04); }
+
+    .btn-secondary{ background:var(--neutral); border-color:var(--border); }
+    .btn-secondary:hover{ filter:brightness(0.98); }
+
+    .btn:focus{ outline:none; box-shadow:0 0 0 3px var(--ring); }
+
+    @media(min-width:480px){ .actions{flex-direction:row; justify-content:center;} .btn{width:auto; min-width:160px;} }
+    @media(prefers-reduced-motion:reduce){ *{transition:none !important} }
+
+    /* Loader pantalla completa */
+    .loader{ position:fixed; inset:0; display:none; place-items:center; z-index:50;
+      background: radial-gradient(100% 100% at 50% 0%, rgba(255,230,239,.9) 0%, rgba(255,241,246,.98) 60%);
+      backdrop-filter: blur(3px);
+    }
+    .loader.visible{ display:grid; }
+    .loader-box{ text-align:center; padding:24px; border-radius:16px; background:rgba(255,255,255,.7); border:1px solid var(--border); width:min(90vw,420px); }
+    .loader-img{ width:56px; height:56px; object-fit:contain; margin:0 auto 10px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.08); display:none; }
+    .spinner{ width:36px; height:36px; margin:0 auto 12px; border-radius:999px; border:3px solid #ffd4e1; border-top-color:#ff7aa2; animation:spin 1s linear infinite; }
+    .loader-text{ color:#5a2032; font-weight:600; }
+    .close-actions{ margin-top:14px; display:none; }
+    .error .spinner{ display:none; }
+    .error .close-actions{ display:block; }
+
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+    @media(prefers-reduced-motion:reduce){ .spinner{ animation:none } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card" role="main" aria-labelledby="titulo">
+      <h1 id="titulo">¿No me quieres?</h1>
+      <p class="desc">Puedes cambiar de opinión, mi bolita de arroz</p>
+
+      <!-- Inserta tu imagen grande aquí -->
+      <img class="hero" src="images/pou_triste.jpeg" alt="Imagen adorable" />
+
+      <nav class="actions" aria-label="Opciones">
+        <button id="btn-si" class="btn btn-primary">Si te quiero</button>
+        <button id="btn-no" class="btn btn-secondary">no</button>
+      </nav>
+    </main>
+  </div>
+
+  <!-- Loader / pantalla de carga personalizable -->
+  <div id="loader" class="loader" role="status" aria-live="polite" aria-label="Cargando">
+    <div class="loader-box">
+      <img id="loader-img" class="loader-img" alt="Imagen de carga" />
+      <div class="spinner" aria-hidden="true"></div>
+      <div id="loader-text" class="loader-text">Cargando…</div>
+      <div class="close-actions">
+        <div id="fallback-msg">Ocurrió un error. Por favor, cierra la pestaña o toca el botón.</div>
+        <button id="forceClose" class="btn btn-secondary" style="margin-top:8px;">que NO puto perro</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === CONFIGURACIÓN RÁPIDA (personaliza a tu gusto) ===
+    const CONFIG = {
+      redirectYesUrl: 'principal_page.html',      // a dónde ir si elige "Sí"
+      loaderYesMsg: 'Yo sabía, gordita. Espera un segundito…',
+      loaderNoMsg: 'Por favor vuelve...', // se muestra mientras carga ANTES del cierre
+      failCloseMsg: 'dije por favor :(',
+      yesDelayMs: 1600,                  // duración de la pantalla de carga (Sí)
+      noDelayMs: 1500,                   // duración de la pantalla de carga (No) antes de intentar cerrar
+      // NUEVO: imágenes pequeñas para los loaders (deja vacío para ocultar)
+      loaderYesImg: 'images/cargasi.jpeg',
+      loaderNoImg: 'images/cargano.jpeg',
+      loaderImgAlt: 'Dibujo adorable'
+    };
+
+    const $ = sel => document.querySelector(sel);
+    const loader = $('#loader');
+    const loaderText = $('#loader-text');
+    const loaderImg = $('#loader-img');
+    const btnSi = $('#btn-si');
+    const btnNo = $('#btn-no');
+    const forceCloseBtn = $('#forceClose');
+    const fallbackMsg = $('#fallback-msg');
+
+    function showLoader(msg, imgSrc){
+      loaderText.textContent = msg || 'Cargando…';
+      loader.classList.remove('error');
+      if (imgSrc) {
+        loaderImg.src = imgSrc;
+        loaderImg.alt = CONFIG.loaderImgAlt || 'Imagen';
+        loaderImg.style.display = 'block';
+      } else {
+        loaderImg.removeAttribute('src');
+        loaderImg.style.display = 'none';
+      }
+      loader.classList.add('visible');
+    }
+
+    function showErrorFallback(msg){
+      loader.classList.add('error');
+      fallbackMsg.textContent = msg || CONFIG.failCloseMsg;
+    }
+
+    // Intenta cerrar la pestaña; si falla, muestra fallback.
+    function attemptCloseWithFallback(){
+      window.close();
+      try { window.open('', '_self'); window.close(); } catch(e) {}
+      setTimeout(() => {
+        if (!window.closed && document.visibilityState !== 'hidden') {
+          showErrorFallback(CONFIG.failCloseMsg);
+        }
+      }, 350);
+    }
+
+    // Botón de cierre manual (puede que el navegador solo lo permita tras gesto del usuario)
+    forceCloseBtn?.addEventListener('click', () => {
+      attemptCloseWithFallback();
+      setTimeout(() => {
+        if (!window.closed) {
+          try { location.replace('about:blank'); } catch(e) {}
+        }
+      }, 500);
+    });
+
+    // Flujo "Sí": loader con imagen -> redirección a principal
+    btnSi?.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      showLoader(CONFIG.loaderYesMsg, CONFIG.loaderYesImg);
+      setTimeout(() => { location.assign(CONFIG.redirectYesUrl); }, CONFIG.yesDelayMs);
+    });
+
+    // Flujo "No": loader con imagen -> intentar cerrar sin mensajes extra
+    btnNo?.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      showLoader(CONFIG.loaderNoMsg, CONFIG.loaderNoImg);
+      setTimeout(() => { attemptCloseWithFallback(); }, CONFIG.noDelayMs);
+    });
+  </script>
+</body>
+</html>
